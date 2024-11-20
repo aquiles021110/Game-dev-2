@@ -1,3 +1,4 @@
+import pygame.key
 import pygame.transform
 import pygame
 pygame.init()
@@ -74,3 +75,21 @@ def gover():
     elif hp2==0:
         winner='YELLOW'
         gameover=True
+while True:
+    for event in pygame.event.get():
+        if event.type==pygame.QUIT:
+            exit()
+        if event.type==pygame.KEYDOWN:
+            if event.key==pygame.K_h:
+                bullet=pygame.Rect(redrect.x+25,redrect.y+25,10,5)
+                bulletr.append(bullet)
+            if event.key==pygame.K_f:
+                bullet=pygame.Rect(yellowrect.x-25,yellowrect.y+25,10,5)
+                bullety.append(bullet)
+    draw()
+    keys=pygame.key.get_pressed()
+    ymov(keys)
+    rmov(keys)
+    bullet(bullety,bulletr)
+    gover()
+    pygame.display.update()
