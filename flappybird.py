@@ -1,6 +1,7 @@
 import pygame
-import random
+from pygame.locals import *
 pygame.init()
+clock=pygame.time.Clock()
 screen=pygame.display.set_mode((800,900))
 pygame.display.set_caption('Birb')
 sky=pygame.image.load('skybird.png')
@@ -26,11 +27,11 @@ class bird(pygame.sprite.Sprite):
         self.click=False
     def update(self):
         if flying==True:
-            #self.velocity+=0.5
+            self.velocity+=0.5
             if self.velocity>8:
                 self.velocity=8
-            #if self.rect.bottom<650:
-              # self.rect.y+=self.velocity
+            if self.rect.bottom<650:
+               self.rect.y+=self.velocity
         if gameover==False:
             if pygame.mouse.get_pressed()[0]==1 and self.click==False:
                  self.click=True
@@ -44,11 +45,25 @@ class bird(pygame.sprite.Sprite):
                 if self.index>=3:
                     self.index=0
                 self.image=self.images[self.index]
+class pipe(pygame.sprite.Sprite):
+    def __init__(self,x,y,pos):
+        super().__init__(self)
+        self.image=pygame.image.load('pipe.png')
+        self.rect=self.image.get_rect()
+        if pos==1:
+            self.image=pygame.transform.flip(self.image,False,True)
+            self.rect.bottomleft=[x,y]
+        elif pos==-1:
+            self.rect.topleft=[x,y]
 bgroup=pygame.sprite.Group()
 flappy=bird(30,200)
 bgroup.add(flappy)
 while True:
+    clock.tick(60)
     screen.blit(sky,(0,0))
+    if flappy.rect.bottom>=650:
+        gameover=True
+        flying=False
     screen.blit(ground,(scroll,650))
     bgroup.draw(screen)
     bgroup.update()
