@@ -1,8 +1,9 @@
 import pygame
+import random
 from pygame.locals import *
 pygame.init()
 clock=pygame.time.Clock()
-screen=pygame.display.set_mode((800,900))
+screen=pygame.display.set_mode((800,800))
 pygame.display.set_caption('Birb')
 sky=pygame.image.load('skybird.png')
 ground=pygame.image.load('floor.png')
@@ -11,6 +12,11 @@ scroll=0
 pipediff=150
 gameover=False
 flying=False
+pipefreq=2500
+lastpipe=pygame.time.get_ticks()-pipefreq
+passing=False
+score=0
+font=pygame.font.SysFont('Arial',30)
 class bird(pygame.sprite.Sprite):
     def __init__(self,x,y):
         pygame.sprite.Sprite.__init__(self)
@@ -47,15 +53,20 @@ class bird(pygame.sprite.Sprite):
                 self.image=self.images[self.index]
 class pipe(pygame.sprite.Sprite):
     def __init__(self,x,y,pos):
-        super().__init__(self)
+        pygame.sprite.Sprite.__init__(self)
         self.image=pygame.image.load('pipe.png')
         self.rect=self.image.get_rect()
         if pos==1:
             self.image=pygame.transform.flip(self.image,False,True)
-            self.rect.bottomleft=[x,y]
+            self.rect.bottomleft=[x,y-pipediff/2]
         elif pos==-1:
-            self.rect.topleft=[x,y]
+            self.rect.topleft=[x,y+pipediff/2]
+    def update(self):
+        self.rect.x-=3
+        if self.rect.right<0:
+            self.kill()
 bgroup=pygame.sprite.Group()
+pipeg=pygame.sprite.Group()
 flappy=bird(30,200)
 bgroup.add(flappy)
 while True:
@@ -64,11 +75,33 @@ while True:
     if flappy.rect.bottom>=650:
         gameover=True
         flying=False
-    screen.blit(ground,(scroll,650))
     bgroup.draw(screen)
+    pipeg.draw(screen)
+    screen.blit(ground,(scroll,650))
     bgroup.update()
+    if len(pipeg)>0:
+        if bgroup.sprites()[0].rect.left>pipeg.sprites()[0].rect.left \
+        and bgroup.sprites()[0].rect.right>pipeg.sprites()[0].rect.right \
+        and passing==False:
+            passing=True
+        if passing==True and bgroup.sprites()[0].rect.left>pipeg.sprites()[0].rect.right:
+            score+=1
+            passing=False
+    scoretxt=font.render(str(score),True,'black')
+    screen.blit(scoretxt,(100,50))
+    if pygame.sprite.groupcollide(bgroup,pipeg,False,False) or flappy.rect.top<0:
+        gameover=True
     if gameover==False:
+       timenow=pygame.time.get_ticks()
        scroll-=5
+       if timenow-lastpipe>pipefreq:
+        pipeh=random.randint(-100,100)
+        bottompipe=pipe(800,450+pipeh,-1)
+        toppipe=pipe(800,450+pipeh,1)
+        pipeg.add(bottompipe)
+        pipeg.add(toppipe)
+        lastpipe=timenow
+       pipeg.update()
        if scroll<-35:
            scroll=0
     for event in pygame.event.get():
