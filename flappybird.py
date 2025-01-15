@@ -104,6 +104,10 @@ while True:
        pipeg.update()
        if scroll<-35:
            scroll=0
+    if gameover==True:
+        screen.blit(restartbutton,(400,400))
+        if pygame.mouse.get_pressed()[0]==0:
+            gameover=False
     for event in pygame.event.get():
         if event.type==pygame.QUIT:
             exit()
