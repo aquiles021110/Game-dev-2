@@ -108,6 +108,10 @@ while True:
         screen.blit(restartbutton,(400,400))
         if pygame.mouse.get_pressed()[0]==0:
             gameover=False
+            score=0
+            pipeg.empty()
+            flappy.rect.x=30
+            flappy.rect.y=200
     for event in pygame.event.get():
         if event.type==pygame.QUIT:
             exit()
