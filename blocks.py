@@ -9,27 +9,36 @@ class blocks(pygame.sprite.Sprite):
     self.image=pygame.Surface((20,30))
     self.image.fill(colour)
     self.rect=self.image.get_rect()
-black_blocks=pygame.sprite.Group()
+  def reset_pos(self):
+    self.rect.y=random.randrange(-300,-20)
+    self.rect.x=random.randrange(0,800)
+  def update(self):
+    self.rect.y+=1
+    if self.rect.y>600:
+      self.reset_pos()
+black_blocks=pygame.sprite.Group()    
 all=pygame.sprite.Group()
 for i in range(50):
   bblock=blocks('black')
-  bblock.rect.x=random.randrange(800)
-  bblock.rect.y=random.randrange(600)
   black_blocks.add(bblock)
   all.add(bblock)
 bred=blocks('red')
 all.add(bred)
+clock=pygame.time.Clock()
 while True:
   for event in pygame.event.get():
     if event.type==pygame.QUIT:
       exit()
   screen.fill('white')
+  all.update()
   pos=pygame.mouse.get_pos()
   bred.rect.x=pos[0]
   bred.rect.y=pos[1]
-  hit=pygame.sprite.spritecollide(bred,black_blocks,True)
+  hit=pygame.sprite.spritecollide(bred,black_blocks,False)
   for i in hit:
     score+=1
     print(score)
+    i.reset_pos()
   all.draw(screen)
+  clock.tick(20)
   pygame.display.update()
